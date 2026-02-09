@@ -1,7 +1,9 @@
 # SonySRGA40
-Control Modules for a Sony SRGA40 PTZ Camera
+Qsys control module for a Sony SRGA40 PTZ Camera
 
 To use the QSYS plugin, download the file and move it to your QSC/Q-Sys Designer/Plugins folder.
+This plugin is intended to be used with a camera that has its SSL setting 'enabled.' Testing was performed with a self-signed certificate.
+If you need to disable SSL on the camera, change the command strings in this module with "https..." to "http..."
 
 Controls:
 <br><br>
