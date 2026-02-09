@@ -1,6 +1,6 @@
 -- SonySRG-A40Control
 -- Created By: Alan Smith, Audio Visual Solutions, The University of Alabama
--- Last Date Updated: 2025-12-3
+-- Last Date Updated: 2025-02-09
 -- License: MIT
 -- -------------------------
 
@@ -12,1487 +12,1537 @@
 -- Latest SRG-A40 firmare tested: 3.01
 
 PluginInfo = {
-    Name = "SonySRG-A40Control",
-    Version = "1.1",
-    Id = "avs_sony_srg_a40_control_working",
-    Description = "Control a Sony SRG-A40 camera via HTTPS",
-    ShowDebug = false,
-    BuildVersion = "1"
+  Name = "SonySRG-A40Control",
+  Version = "1",
+  Id = "avs_sony_srg_a40_control",
+  Description = "Control a Sony SRG-A40 camera via HTTPS",
+  ShowDebug = false,
+  BuildVersion = "1"
 };
 
 -- -------------------------
 
 -- *** Reserved Functions ***
 function GetColor(props)
-    return {50,50,50}
+  return {50,50,50}
 end
 
 function GetPrettyName(props)
-    return PluginInfo.Name
+  return PluginInfo.Name
 end
 
 function GetProperties()
-    props = {}
-    return props
+  props = {}
+  return props
 end
 
 PageNames = { "Config", "PTZ / Power", "Preset Pos.", "Auto-Framing" }
 function GetPages(props)
-    local pages = {}
-    for i,name in ipairs(PageNames) do
-        table.insert(pages, {name = PageNames[i]})
-    end
+  local pages = {}
+  for i,name in ipairs(PageNames) do
+  table.insert(pages, {name = PageNames[i]})
+  end
   
-    return pages
+  return pages
 end
 
 function RectifyProperties(props)
-    return props
+  return props
 end
 
 function GetControls(props)
-    local ctrl = {}
+  local ctrl = {}
 
-    table.insert(ctrl, {
-        Name = "Ip",
-        ControlType = "Text",
-        Description = "Camera IP Address",
-        UserPin = true,
-        PinStyle = "Input"
-    })
+  table.insert(ctrl, {
+    Name = "Ip",
+    ControlType = "Text",
+    Description = "Camera IP Address",
+    UserPin = true,
+    PinStyle = "Input"
+  })
 
-    table.insert(ctrl, {
-        Name = "Username",
-        ControlType = "Text",
-        Description = "Camera username",
-        UserPin = true,
-        PinStyle = "Input"
-    })
+  table.insert(ctrl, {
+    Name = "Username",
+    ControlType = "Text",
+    Description = "Camera username",
+    UserPin = true,
+    PinStyle = "Input"
+  })
 
-    table.insert(ctrl, {
-        Name = "Password",
-        ControlType = "Text",
-        Description = "Camera password",
-        UserPin = true,
-        PinStyle = "Input"
-    })
+  table.insert(ctrl, {
+    Name = "Password",
+    ControlType = "Text",
+    Description = "Camera password",
+    UserPin = true,
+    PinStyle = "Input"
+  })
 
-    table.insert(ctrl, {
-        Name = "PollTime",
-        ControlType = "Text",
-        Default = "60",
-        Description = "time between polls",
-        UserPin = true,
-        PinStyle = "Input"
-    })
+  table.insert(ctrl, {
+    Name = "PollTime",
+    ControlType = "Text",
+    Default = "60",
+    Description = "time between polls",
+    UserPin = true,
+    PinStyle = "Input"
+  })
 
-    table.insert(ctrl, {
-        Name = "PowerToggle",
-        ControlType = "Button",
-        ButtonType = "Toggle",
-        UserPin = true,
-        PinStyle = "Input",
-        Icon = "Power"
-    })
+  table.insert(ctrl, {
+    Name = "PowerToggle",
+    ControlType = "Button",
+    ButtonType = "Toggle",
+    UserPin = true,
+    PinStyle = "Both",
+    Icon = "Power"
+  })
 
-    table.insert(ctrl, {
-        Name = "PowerOn",
-        ControlType = "Button",
-        ButtonType = "Trigger",
-        UserPin = true,
-        PinStyle = "Input",
-    })
+  table.insert(ctrl, {
+    Name = "PowerOn",
+    ControlType = "Button",
+    ButtonType = "Trigger",
+    UserPin = true,
+    PinStyle = "Input",
+  })
 
-    table.insert(ctrl, {
-        Name = "PowerOff",
-        ControlType = "Button",
-        ButtonType = "Trigger",
-        UserPin = true,
-        PinStyle = "Input",
-    })
+  table.insert(ctrl, {
+    Name = "PowerOff",
+    ControlType = "Button",
+    ButtonType = "Trigger",
+    UserPin = true,
+    PinStyle = "Input",
+  })
 
-    table.insert(ctrl, {
-        Name = "PowerReboot",
-        ControlType = "Button",
-        ButtonType = "Trigger",
-        UserPin = true,
-        PinStyle = "Input",
-        Icon = "Loop"
-    })
+  table.insert(ctrl, {
+    Name = "PowerReboot",
+    ControlType = "Button",
+    ButtonType = "Trigger",
+    UserPin = true,
+    PinStyle = "Input",
+    Icon = "Loop"
+  })
 
-    table.insert(ctrl, {
-        Name = "PanLeft",
-        ControlType = "Button",
-        ButtonType = "Momentary",
-        UserPin = false,
-        Icon = "Arrow Left"
-    })
+  table.insert(ctrl, {
+    Name = "PanLeft",
+    ControlType = "Button",
+    ButtonType = "Momentary",
+    UserPin = false,
+    Icon = "Arrow Left"
+  })
 
-    table.insert(ctrl, {
-        Name = "PanRight",
-        ControlType = "Button",
-        ButtonType = "Momentary",
-        UserPin = false,
-        Icon = "Arrow Right"
-    })
+  table.insert(ctrl, {
+    Name = "PanRight",
+    ControlType = "Button",
+    ButtonType = "Momentary",
+    UserPin = false,
+    Icon = "Arrow Right"
+  })
 
-    table.insert(ctrl, {
-        Name = "TiltUp",
-        ControlType = "Button",
-        ButtonType = "Momentary",
-        UserPin = false,
-        Icon = "Arrow Up"
-    })
+  table.insert(ctrl, {
+    Name = "TiltUp",
+    ControlType = "Button",
+    ButtonType = "Momentary",
+    UserPin = false,
+    Icon = "Arrow Up"
+  })
 
-    table.insert(ctrl, {
-        Name = "TiltDown",
-        ControlType = "Button",
-        ButtonType = "Momentary",
-        UserPin = false,
-        Icon = "Arrow Down"
-    })
+  table.insert(ctrl, {
+    Name = "TiltDown",
+    ControlType = "Button",
+    ButtonType = "Momentary",
+    UserPin = false,
+    Icon = "Arrow Down"
+  })
 
-    table.insert(ctrl, {
-        Name = "UpLeft",
-        ControlType = "Button",
-        ButtonType = "Momentary",
-        UserPin = false,
-        Icon = "Arrow Left-Up"
-    })
+  table.insert(ctrl, {
+    Name = "UpLeft",
+    ControlType = "Button",
+    ButtonType = "Momentary",
+    UserPin = false,
+    Icon = "Arrow Left-Up"
+  })
 
-    table.insert(ctrl, {
-        Name = "UpRight",
-        ControlType = "Button",
-        ButtonType = "Momentary",
-        UserPin = false,
-        Icon = "Arrow Right-Up"
-    })
+  table.insert(ctrl, {
+    Name = "UpRight",
+    ControlType = "Button",
+    ButtonType = "Momentary",
+    UserPin = false,
+    Icon = "Arrow Right-Up"
+  })
 
-    table.insert(ctrl, {
-        Name = "DownLeft",
-        ControlType = "Button",
-        ButtonType = "Momentary",
-        UserPin = false,
-        Icon = "Arrow Left-Down"
-    })
+  table.insert(ctrl, {
+    Name = "DownLeft",
+    ControlType = "Button",
+    ButtonType = "Momentary",
+    UserPin = false,
+    Icon = "Arrow Left-Down"
+  })
 
-    table.insert(ctrl, {
-        Name = "DownRight",
-        ControlType = "Button",
-        ButtonType = "Momentary",
-        UserPin = false,
-        Icon = "Arrow Right-Down"
-    })
+  table.insert(ctrl, {
+    Name = "DownRight",
+    ControlType = "Button",
+    ButtonType = "Momentary",
+    UserPin = false,
+    Icon = "Arrow Right-Down"
+  })
 
-    table.insert(ctrl, {
-        Name = "ZoomIn",
-        ControlType = "Button",
-        ButtonType = "Momentary",
-        UserPin = false,
-        Icon = "Zoom In"
-    })
+  table.insert(ctrl, {
+    Name = "ZoomIn",
+    ControlType = "Button",
+    ButtonType = "Momentary",
+    UserPin = false,
+    Icon = "Zoom In"
+  })
 
-    table.insert(ctrl, {
-        Name = "ZoomOut",
-        ControlType = "Button",
-        ButtonType = "Momentary",
-        UserPin = false,
-        Icon = "Zoom Out"
-    })
+  table.insert(ctrl, {
+    Name = "ZoomOut",
+    ControlType = "Button",
+    ButtonType = "Momentary",
+    UserPin = false,
+    Icon = "Zoom Out"
+  })
 
-    table.insert(ctrl, {
-        Name = "AutoframeToggle",
-        ControlType = "Button",
-        ButtonType = "Toggle",
-        UserPin = true,
-        PinStyle = "Both"
-    })
+  table.insert(ctrl, {
+    Name = "AutoframeToggle",
+    ControlType = "Button",
+    ButtonType = "Toggle",
+    UserPin = true,
+    PinStyle = "Both"
+  })
 
-    table.insert(ctrl, {
-        Name = "MultitrackingToggle",
-        ControlType = "Button",
-        ButtonType = "Toggle",
-        UserPin = true,
-        PinStyle = "Both"
-    })
+  table.insert(ctrl, {
+    Name = "MultitrackingToggle",
+    ControlType = "Button",
+    ButtonType = "Toggle",
+    UserPin = true,
+    PinStyle = "Both"
+  })
 
-    table.insert(ctrl, {
-        Name = "Multitrack",
-        ControlType = "Button",
-        ButtonType = "Trigger",
-        Count = 8,
-        UserPin = true,
-        PinStyle = "Input"
-    })
+  table.insert(ctrl, {
+    Name = "Multitrack",
+    ControlType = "Button",
+    ButtonType = "Trigger",
+    Count = 8,
+    UserPin = true,
+    PinStyle = "Input"
+  })
 
-    table.insert(ctrl, {
-        Name = "FramingFace",
-        ControlType = "Button",
-        ButtonType = "Trigger",
-        UserPin = true,
-        PinStyle = "Input"
-    })
+  table.insert(ctrl, {
+    Name = "FramingFace",
+    ControlType = "Button",
+    ButtonType = "Trigger",
+    UserPin = true,
+    PinStyle = "Input"
+  })
 
-    table.insert(ctrl, {
-        Name = "FramingBody",
-        ControlType = "Button",
-        ButtonType = "Trigger",
-        UserPin = true,
-        PinStyle = "Input"
-    })
+  table.insert(ctrl, {
+    Name = "FramingBody",
+    ControlType = "Button",
+    ButtonType = "Trigger",
+    UserPin = true,
+    PinStyle = "Input"
+  })
 
-    table.insert(ctrl, {
-        Name = "FramingFull",
-        ControlType = "Button",
-        ButtonType = "Trigger",
-        UserPin = true,
-        PinStyle = "Input"
-    })
+  table.insert(ctrl, {
+    Name = "FramingFull",
+    ControlType = "Button",
+    ButtonType = "Trigger",
+    UserPin = true,
+    PinStyle = "Input"
+  })
 
-    table.insert(ctrl, {
-        Name = "PresetRecall",
-        ControlType = "Button",
-        ButtonType = "Trigger",
-        Count = 5,
-        UserPin = true,
-        PinStyle = "Input"
-    })
+  table.insert(ctrl, {
+    Name = "PresetRecall",
+    ControlType = "Button",
+    ButtonType = "Momentary",
+    Count = 5,
+    UserPin = true,
+    PinStyle = "Input"
+  })
 
-    table.insert(ctrl, {
-        Name = "PresetStore",
-        ControlType = "Button",
-        ButtonType = "Trigger",
-        Count = 5,
-        UserPin = true,
-        PinStyle = "Input"
-    })
+  table.insert(ctrl, {
+    Name = "PresetStore",
+    ControlType = "Button",
+    ButtonType = "Trigger",
+    Count = 5,
+    UserPin = true,
+    PinStyle = "Input"
+  })
 
-    table.insert(ctrl, {
-        Name = "Home",
-        ControlType = "Button",
-        ButtonType = "Trigger",
-        UserPin = true,
-        PinStyle = "Input",
-        Icon = "Home"
-    })
+  table.insert(ctrl, {
+    Name = "Home",
+    ControlType = "Button",
+    ButtonType = "Trigger",
+    UserPin = true,
+    PinStyle = "Input",
+    Icon = "Home"
+  })
 
-    table.insert(ctrl, {
-        Name = "Privacy",
-        ControlType = "Button",
-        ButtonType = "Trigger",
-        UserPin = true,
-        PinStyle = "Input",
-        Icon = "Prohibited"
-    })
+  table.insert(ctrl, {
+    Name = "Privacy",
+    ControlType = "Button",
+    ButtonType = "Trigger",
+    UserPin = true,
+    PinStyle = "Input",
+    Icon = "Prohibited"
+  })
 
-    return ctrl
+  return ctrl
 end
 
 function GetControlLayout(props)
-    layout = {}
-    graphics = {}
-    local CurrentPage = PageNames[props["page_index"].Value]
+  layout = {}
+  graphics = {}
+  local currentPage = PageNames[props["page_index"].Value]
 
-    if CurrentPage == "Config" then
-        -- *** Background ***
-        table.insert(graphics, {
-            Type = "GroupBox",
-            Position = {0,30},
-            Size = {600,225},
-            Fill = {205,205,205},
-            CornerRadius = 0,
-            StrokeColor = {0,0,0},
-            StrokeWidth = 0
-        })
+  if (currentPage == "Config") then
 
-        -- *** Header ***
-        table.insert(graphics, {
-            Type = "Label",
-            Position = {0,0},
-            Size = {600,30},
-            Color = {255,255,255},
-            Text = "Sony SRG-A40 Control",
-            FontSize = 14,
-            FontStyle = "Bold",
-            HTextAlign = "Center",
-            Fill = {0,0,0},
-            CornerRadius = 0
-        })
+    -- *** Background ***
+    table.insert(graphics, {
+      Type = "GroupBox",
+      Position = {0,30},
+      Size = {600,225},
+      Fill = {205,205,205},
+      CornerRadius = 0,
+      StrokeColor = {0,0,0},
+      StrokeWidth = 0
+    })
 
-        -- *** IP ***
-        table.insert(graphics, {
-            Type = "GroupBox",
-            Position = {20,60},
-            Size = {560,30},
-            StrokeColor = {0,0,0},
-            StrokeWidth = 1,
-            Fill = {255,255,255,0},
-            CornerRadius = 8
-        })
+    -- *** Header ***
+    table.insert(graphics, {
+      Type = "Label",
+      Position = {0,0},
+      Size = {600,30},
+      Color = {255,255,255},
+      Text = "Sony SRG-A40 Control",
+      FontSize = 14,
+      FontStyle = "Bold",
+      HTextAlign = "Center",
+      Fill = {0,0,0},
+      CornerRadius = 0
+    })
+  
+    -- *** IP ***
+    table.insert(graphics, {
+      Type = "GroupBox",
+      Position = {20,60},
+      Size = {560,30},
+      StrokeColor = {0,0,0},
+      StrokeWidth = 1,
+      Fill = {255,255,255,0},
+      CornerRadius = 8
+    })
+  
+    table.insert(graphics, {
+      Type = "Label",
+      Position = {20,60},
+      Size = {79,30},
+      Color = {0,0,0},
+      Text = "IP Address:",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Medium",
+      HTextAlign = "Center",
+      VTextAlign = "Center"
+    })
+  
+    layout["Ip"] = {
+      Style = "Text",
+      Position = {125,60},
+      Size = {380,30},
+      Color = {255,255,255, 0},
+      Fill = {50,50,50},
+      Font = "Roboto",
+      FontSize = 9,
+      FontStyle = "Regular",
+      HTextAlign = "Center",
+      VTextAlign = "Center",
+      CornerRadius = 8,
+      StrokeWidth = 1
+    }
+  
+    -- *** User ***
+    table.insert(graphics, {
+      Type = "GroupBox",
+      Position = {20,100},
+      Size = {560,30},
+      StrokeColor = {0,0,0},
+      StrokeWidth = 1,
+      Fill = {255,255,255,0},
+      CornerRadius = 8,
+    })
+  
+    table.insert(graphics, {
+      Type = "Label",
+      Position = {20,100},
+      Size = {79,30},
+      Color = {0,0,0},
+      Text = "Username:",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Medium",
+      HTextAlign = "Center",
+      VTextAlign = "Center"
+    })
+  
+    layout["Username"] = {
+      Style = "Text",
+      Position = {125,100},
+      Size = {380,30},
+      Color = {255,255,255, 0},
+      Fill = {50,50,50},
+      Font = "Roboto",
+      FontSize = 9,
+      FontStyle = "Regular",
+      HTextAlign = "Center",
+      VTextAlign = "Center",
+      CornerRadius = 8,
+      StrokeWidth = 1
+    }
+  
+    -- *** Password ***
+    table.insert(graphics, {
+      Type = "GroupBox",
+      Position = {20,140},
+      Size = {560,30},
+      StrokeColor = {0,0,0},
+      StrokeWidth = 1,
+      Fill = {255,255,255,0},
+      CornerRadius = 8
+    })
+  
+    table.insert(graphics, {
+      Type = "Label",
+      Position = {20,140},
+      Size = {79,30},
+      Color = {0,0,0},
+      Text = "Password:",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Medium",
+      HTextAlign = "Right",
+      VTextAlign = "Left"
+    })
+  
+    layout["Password"] = {
+      Style = "Text",
+      Position = {125,140},
+      Size = {380,30},
+      Color = {255,255,255, 0},
+      Fill = {50,50,50},
+      Font = "Roboto",
+      FontSize = 9,
+      FontStyle = "Regular",
+      HTextAlign = "Center",
+      VTextAlign = "Center",
+      CornerRadius = 8,
+      StrokeWidth = 1
+    }
+  
+    -- *** PollTime ***
+    table.insert(graphics, {
+      Type = "GroupBox",
+      Position = {20,180},
+      Size = {560,30},
+      StrokeColor = {0,0,0},
+      StrokeWidth = 1,
+      Fill = {255,255,255,0},
+      CornerRadius = 8
+    })
+  
+    table.insert(graphics, {
+      Type = "Label",
+      Position = {20,180},
+      Size = {90,30},
+      Color = {0,0,0},
+      Text = "Poll (seconds):",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Medium",
+      HTextAlign = "Right",
+      VTextAlign = "Center"
+    })
+  
+    layout["PollTime"] = {
+      Style = "Text",
+      Position = {125,180},
+      Size = {380,30},
+      Color = {255,255,255, 0},
+      Fill = {50,50,50},
+      Font = "Roboto",
+      FontSize = 9,
+      FontStyle = "Regular",
+      HTextAlign = "Center",
+      VTextAlign = "Center",
+      CornerRadius = 8,
+      StrokeWidth = 1
+    }
 
-        table.insert(graphics, {
-            Type = "Label",
-            Position = {20,60},
-            Size = {79,30},
-            Color = {0,0,0},
-            Text = "IP Address:",
-            Font = "Roboto",
-            FontSize = 12,
-            FontStyle = "Medium",
-            HTextAlign = "Center",
-            VTextAlign = "Center"
-        })
+  elseif (currentPage == "PTZ / Power") then
 
-        layout["Ip"] = {
-            Style = "Text",
-            Position = {125,60},
-            Size = {380,30},
-            Color = {255,255,255, 0},
-            Fill = {50,50,50},
-            Font = "Roboto",
-            FontSize = 9,
-            FontStyle = "Regular",
-            HTextAlign = "Center",
-            VTextAlign = "Center",
-            CornerRadius = 8,
-            StrokeWidth = 1
-        }
+    -- *** Background ***
+    table.insert(graphics, {
+      Type = "GroupBox",
+      Position = {0,0},
+      Size = {600,225},
+      Fill = {205,205,205},
+      CornerRadius = 0,
+      StrokeColor = {0,0,0},
+      StrokeWidth = 0
+    })
+  
+    -- *** PTZ ***
+    table.insert(graphics,{
+      Type = "GroupBox",
+      Position = {20,20},
+      Size = {260,177},
+      Fill = {255,255,255,0},
+      CornerRadius = 8,
+      StrokeColor = {0,0,0},
+      StrokeWidth = 1
+    })
+  
+    layout["PanLeft"] = {
+      Style = "Button",
+      ButtonStyle = "Momentary",
+      Position = {30,83},
+      Size = {45,45},
+      Color = {0,255,0},
+      OffColor = {0,159,60},
+      Margin = 2,
+      CornerRadius = 2,
+      IconColor = {255,255,255},
+      ButtonVisualStyle = "Gloss"
+    }
+  
+    layout["UpLeft"] = {
+      Style = "Button",
+      ButtonStyle = "Momentary",
+      Position = {30,30},
+      Size = {45,45},
+      Color = {0,255,0},
+      OffColor = {0,159,60},
+      Margin = 2,
+      CornerRadius = 2,
+      IconColor = {255,255,255},
+      ButtonVisualStyle = "Gloss"
+    }
+  
+    layout["DownLeft"] = {
+      Style = "Button",
+      ButtonStyle = "Momentary",
+      Position = {30,136},
+      Size = {45,45},
+      Color = {0,255,0},
+      OffColor = {0,159,60},
+      Margin = 2,
+      CornerRadius = 2,
+      IconColor = {255,255,255},
+      ButtonVisualStyle = "Gloss"
+    }
+  
+    layout["PanRight"] = {
+      Style = "Button",
+      ButtonStyle = "Momentary",
+      Position = {136,83},
+      Size = {45,45},
+      Color = {0,255,0},
+      OffColor = {0,159,60},
+      Margin = 2,
+      CornerRadius = 2,
+      IconColor = {255,255,255},
+      ButtonVisualStyle = "Gloss"
+    }
+  
+    layout["UpRight"] = {
+      Style = "Button",
+      ButtonStyle = "Momentary",
+      Position = {136,30},
+      Size = {45,45},
+      Color = {0,255,0},
+      OffColor = {0,159,60},
+      Margin = 2,
+      CornerRadius = 2,
+      IconColor = {255,255,255},
+      ButtonVisualStyle = "Gloss"
+    }
+  
+    layout["DownRight"] = {
+      Style = "Button",
+      ButtonStyle = "Momentary",
+      Position = {136,136},
+      Size = {45,45},
+      Color = {0,255,0},
+      OffColor = {0,159,60},
+      Margin = 2,
+      CornerRadius = 2,
+      IconColor = {255,255,255},
+      ButtonVisualStyle = "Gloss"
+    }
+  
+    layout["TiltUp"] = {
+      Style = "Button",
+      ButtonStyle = "Momentary",
+      Position = {83,30},
+      Size = {45,45},
+      Color = {0,255,0},
+      OffColor = {0,159,60},
+      Margin = 2,
+      CornerRadius = 2,
+      IconColor = {255,255,255},
+      ButtonVisualStyle = "Gloss"
+    }
+  
+    layout["TiltDown"] = {
+      Style = "Button",
+      ButtonStyle = "Momentary",
+      Position = {83,136},
+      Size = {45,45},
+      Color = {0,255,0},
+      OffColor = {0,159,60},
+      Margin = 2,
+      CornerRadius = 2,
+      IconColor = {255,255,255},
+      ButtonVisualStyle = "Gloss"
+    }
+  
+    layout["ZoomIn"] = {
+      Style = "Button",
+      ButtonStyle = "Momentary",
+      Position = {189,58},
+      Size = {45,45},
+      Color = {0,255,0},
+      OffColor = {0,159,60},
+      Margin = 2,
+      CornerRadius = 2,
+      IconColor = {255,255,255},
+      ButtonVisualStyle = "Gloss"
+    }
+  
+    layout["ZoomOut"] = {
+      Style = "Button",
+      ButtonStyle = "Momentary",
+      Position = {189,111},
+      Size = {45,45},
+      Color = {0,255,0},
+      OffColor = {0,159,60},
+      Margin = 2,
+      CornerRadius = 2,
+      IconColor = {255,255,255},
+      ButtonVisualStyle = "Gloss"
+    }
+  
+    -- *** Power ***
+    table.insert(graphics,{
+      Type="GroupBox",
+      Position={320,20},
+      Size={260,177},
+      Fill={255,255,255,0},
+      CornerRadius=8,
+      StrokeColor={0,0,0},
+      StrokeWidth=1
+    })
+  
+    table.insert(graphics,{
+      Type="Label",
+      Position={340,40},
+      Size={60,20},
+      Color = {0,0,0},
+      Text = "Power",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Medium",
+      HTextAlign = "Center",
+      VTextAlign = "Center"
+    })
+  
+    table.insert(graphics,{
+      Type="Label",
+      Position={410,40},
+      Size={60,20},
+      Color = {0,0,0},
+      Text = "Reboot",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Medium",
+      HTextAlign = "Center",
+      VTextAlign = "Center"
+    })
+  
+    layout["PowerToggle"] = {
+      Style="Button",
+      ButtonStyle = "Toggle",
+      Position= {340,60},
+      Size= {60,60},
+      Color = {0,159,60},
+      UnlinkOffColor = true,
+      OffColor = {169,0,23},
+      Margin = 2,
+      CornerRadius = 2,
+      IconColor = {255,255,255},
+      ButtonVisualStyle = "Gloss"
+    }
+  
+    layout["PowerReboot"] = {
+      Style = "Button",
+      ButtonStyle = "Trigger",
+      Position = {410,60},
+      Size = {60,60},
+      Color = {0,255,0},
+      OffColor = {0,159,60},
+      Margin = 2,
+      CornerRadius = 2,
+      IconColor = {255,255,255},
+      ButtonVisualStyle = "Gloss"
+    }
+  
+    -- I want PowerOn and PowerOff in Controls object, but not the UI, so I will put them with size {0,0} in the corner:
+    layout["PowerOn"] = {
+      Style = "Button",
+      ButtonStyle = "Trigger",
+      Position = {600,225},
+      Size = {0,0},
+      Color = {205,205,205},
+      OffColor = {205,205,205},
+    }
+  
+    layout["PowerOff"] = {
+      Style = "Button",
+      ButtonStyle = "Trigger",
+      Position = {600,225},
+      Size = {0,0},
+      Color = {205,205,205},
+      OffColor = {205,205,205},
+    }
 
-        -- *** User ***
-        table.insert(graphics, {
-            Type = "GroupBox",
-            Position = {20,100},
-            Size = {560,30},
-            StrokeColor = {0,0,0},
-            StrokeWidth = 1,
-            Fill = {255,255,255,0},
-            CornerRadius = 8,
-        })
+  elseif (currentPage == "Preset Pos.") then
 
-        table.insert(graphics, {
-            Type = "Label",
-            Position = {20,100},
-            Size = {79,30},
-            Color = {0,0,0},
-            Text = "Username:",
-            Font = "Roboto",
-            FontSize = 12,
-            FontStyle = "Medium",
-            HTextAlign = "Center",
-            VTextAlign = "Center"
-        })
-
-        layout["Username"] = {
-            Style = "Text",
-            Position = {125,100},
-            Size = {380,30},
-            Color = {255,255,255, 0},
-            Fill = {50,50,50},
-            Font = "Roboto",
-            FontSize = 9,
-            FontStyle = "Regular",
-            HTextAlign = "Center",
-            VTextAlign = "Center",
-            CornerRadius = 8,
-            StrokeWidth = 1
-        }
-
-        -- *** Password ***
-        table.insert(graphics, {
-            Type = "GroupBox",
-            Position = {20,140},
-            Size = {560,30},
-            StrokeColor = {0,0,0},
-            StrokeWidth = 1,
-            Fill = {255,255,255,0},
-            CornerRadius = 8
-        })
-
-        table.insert(graphics, {
-            Type = "Label",
-            Position = {20,140},
-            Size = {79,30},
-            Color = {0,0,0},
-            Text = "Password:",
-            Font = "Roboto",
-            FontSize = 12,
-            FontStyle = "Medium",
-            HTextAlign = "Right",
-            VTextAlign = "Left"
-        })
-
-        layout["Password"] = {
-            Style = "Text",
-            Position = {125,140},
-            Size = {380,30},
-            Color = {255,255,255, 0},
-            Fill = {50,50,50},
-            Font = "Roboto",
-            FontSize = 9,
-            FontStyle = "Regular",
-            HTextAlign = "Center",
-            VTextAlign = "Center",
-            CornerRadius = 8,
-            StrokeWidth = 1
-        }
-
-        -- *** PollTime ***
-        table.insert(graphics, {
-            Type = "GroupBox",
-            Position = {20,180},
-            Size = {560,30},
-            StrokeColor = {0,0,0},
-            StrokeWidth = 1,
-            Fill = {255,255,255,0},
-            CornerRadius = 8
-        })
-
-        table.insert(graphics, {
-            Type = "Label",
-            Position = {20,180},
-            Size = {90,30},
-            Color = {0,0,0},
-            Text = "Poll (seconds):",
-            Font = "Roboto",
-            FontSize = 12,
-            FontStyle = "Medium",
-            HTextAlign = "Right",
-            VTextAlign = "Center"
-        })
-
-        layout["PollTime"] = {
-            Style = "Text",
-            Position = {125,180},
-            Size = {380,30},
-            Color = {255,255,255, 0},
-            Fill = {50,50,50},
-            Font = "Roboto",
-            FontSize = 9,
-            FontStyle = "Regular",
-            HTextAlign = "Center",
-            VTextAlign = "Center",
-            CornerRadius = 8,
-            StrokeWidth = 1
-        }
-
-    elseif CurrentPage == "PTZ / Power" then
-
-        -- *** Background ***
-        table.insert(graphics, {
-            Type = "GroupBox",
-            Position = {0,0},
-            Size = {600,225},
-            Fill = {205,205,205},
-            CornerRadius = 0,
-            StrokeColor = {0,0,0},
-            StrokeWidth = 0
-        })
-
-        -- *** PTZ ***
-        table.insert(graphics,{
-            Type = "GroupBox",
-            Position = {20,20},
-            Size = {260,177},
-            Fill = {255,255,255,0},
-            CornerRadius = 8,
-            StrokeColor = {0,0,0},
-            StrokeWidth = 1
-        })
-
-        layout["PanLeft"] = {
-            Style = "Button",
-            ButtonStyle = "Momentary",
-            Position = {30,83},
-            Size = {45,45},
-            Color = {0,255,0},
-            OffColor = {0,159,60},
-            Margin = 2,
-            CornerRadius = 2,
-            IconColor = {255,255,255},
-            ButtonVisualStyle = "Gloss"
-        }
-
-        layout["UpLeft"] = {
-            Style = "Button",
-            ButtonStyle = "Momentary",
-            Position = {30,30},
-            Size = {45,45},
-            Color = {0,255,0},
-            OffColor = {0,159,60},
-            Margin = 2,
-            CornerRadius = 2,
-            IconColor = {255,255,255},
-            ButtonVisualStyle = "Gloss"
-        }
-
-        layout["DownLeft"] = {
-            Style = "Button",
-            ButtonStyle = "Momentary",
-            Position = {30,136},
-            Size = {45,45},
-            Color = {0,255,0},
-            OffColor = {0,159,60},
-            Margin = 2,
-            CornerRadius = 2,
-            IconColor = {255,255,255},
-            ButtonVisualStyle = "Gloss"
-        }
-
-        layout["PanRight"] = {
-            Style = "Button",
-            ButtonStyle = "Momentary",
-            Position = {136,83},
-            Size = {45,45},
-            Color = {0,255,0},
-            OffColor = {0,159,60},
-            Margin = 2,
-            CornerRadius = 2,
-            IconColor = {255,255,255},
-            ButtonVisualStyle = "Gloss"
-        }
-
-        layout["UpRight"] = {
-            Style = "Button",
-            ButtonStyle = "Momentary",
-            Position = {136,30},
-            Size = {45,45},
-            Color = {0,255,0},
-            OffColor = {0,159,60},
-            Margin = 2,
-            CornerRadius = 2,
-            IconColor = {255,255,255},
-            ButtonVisualStyle = "Gloss"
-        }
-
-        layout["DownRight"] = {
-            Style = "Button",
-            ButtonStyle = "Momentary",
-            Position = {136,136},
-            Size = {45,45},
-            Color = {0,255,0},
-            OffColor = {0,159,60},
-            Margin = 2,
-            CornerRadius = 2,
-            IconColor = {255,255,255},
-            ButtonVisualStyle = "Gloss"
-        }
-
-        layout["TiltUp"] = {
-            Style = "Button",
-            ButtonStyle = "Momentary",
-            Position = {83,30},
-            Size = {45,45},
-            Color = {0,255,0},
-            OffColor = {0,159,60},
-            Margin = 2,
-            CornerRadius = 2,
-            IconColor = {255,255,255},
-            ButtonVisualStyle = "Gloss"
-        }
-
-        layout["TiltDown"] = {
-            Style = "Button",
-            ButtonStyle = "Momentary",
-            Position = {83,136},
-            Size = {45,45},
-            Color = {0,255,0},
-            OffColor = {0,159,60},
-            Margin = 2,
-            CornerRadius = 2,
-            IconColor = {255,255,255},
-            ButtonVisualStyle = "Gloss"
-        }
-
-        layout["ZoomIn"] = {
-            Style = "Button",
-            ButtonStyle = "Momentary",
-            Position = {189,58},
-            Size = {45,45},
-            Color = {0,255,0},
-            OffColor = {0,159,60},
-            Margin = 2,
-            CornerRadius = 2,
-            IconColor = {255,255,255},
-            ButtonVisualStyle = "Gloss"
-        }
-
-        layout["ZoomOut"] = {
-            Style = "Button",
-            ButtonStyle = "Momentary",
-            Position = {189,111},
-            Size = {45,45},
-            Color = {0,255,0},
-            OffColor = {0,159,60},
-            Margin = 2,
-            CornerRadius = 2,
-            IconColor = {255,255,255},
-            ButtonVisualStyle = "Gloss"
-        }
-
-        -- *** Power ***
-        table.insert(graphics,{
-            Type="GroupBox",
-            Position={320,20},
-            Size={260,177},
-            Fill={255,255,255,0},
-            CornerRadius=8,
-            StrokeColor={0,0,0},
-            StrokeWidth=1
-        })
-
-        table.insert(graphics,{
-            Type="Label",
-            Position={340,40},
-            Size={60,20},
-            Color = {0,0,0},
-            Text = "Power",
-            Font = "Roboto",
-            FontSize = 12,
-            FontStyle = "Medium",
-            HTextAlign = "Center",
-            VTextAlign = "Center"
-        })
-
-        table.insert(graphics,{
-            Type="Label",
-            Position={410,40},
-            Size={60,20},
-            Color = {0,0,0},
-            Text = "Reboot",
-            Font = "Roboto",
-            FontSize = 12,
-            FontStyle = "Medium",
-            HTextAlign = "Center",
-            VTextAlign = "Center"
-        })
-
-        layout["PowerToggle"] = {
-            Style="Button",
-            ButtonStyle = "Toggle",
-            Position= {340,60},
-            Size= {60,60},
-            Color = {0,159,60},
-            UnlinkOffColor = true,
-            OffColor = {169,0,23},
-            Margin = 2,
-            CornerRadius = 2,
-            IconColor = {255,255,255},
-            ButtonVisualStyle = "Gloss"
-        }
-
-        layout["PowerReboot"] = {
-            Style = "Button",
-            ButtonStyle = "Trigger",
-            Position = {410,60},
-            Size = {60,60},
-            Color = {0,255,0},
-            OffColor = {0,159,60},
-            Margin = 2,
-            CornerRadius = 2,
-            IconColor = {255,255,255},
-            ButtonVisualStyle = "Gloss"
-        }
-
-        -- I want these 2 in Controls object, but not the UI:
-        layout["PowerOn"] = {
-            Style = "Button",
-            ButtonStyle = "Trigger",
-            Position = {600,225},
-            Size = {0,0},
-            Color = {205,205,205},
-            OffColor = {205,205,205},
-        }
-
-        layout["PowerOff"] = {
-            Style = "Button",
-            ButtonStyle = "Trigger",
-            Position = {600,225},
-            Size = {0,0},
-            Color = {205,205,205},
-            OffColor = {205,205,205},
-        }
-
-    elseif CurrentPage == "Preset Pos." then
-        -- *** Background ***
-        table.insert(graphics, {
-            Type = "GroupBox",
-            Position = {0,0},
-            Size = {600,225},
-            Fill = {205,205,205},
-            CornerRadius = 0,
-            StrokeColor = {0,0,0},
-            StrokeWidth = 0
-        })
-
-        -- *** Preset Recalls ***
-        table.insert(graphics, {
-            Type = "GroupBox",
-            Position = {20,20},
-            Size = {560,65},
-            StrokeColor = {0,0,0},
-            StrokeWidth = 1,
-            Fill = {255,255,255,0},
-            CornerRadius = 8
-        })
+    -- *** Background ***
+    table.insert(graphics, {
+      Type = "GroupBox",
+      Position = {0,0},
+      Size = {600,225},
+      Fill = {205,205,205},
+      CornerRadius = 0,
+      StrokeColor = {0,0,0},
+      StrokeWidth = 0
+    })
+  
+    -- *** Preset Recalls ***
+    table.insert(graphics, {
+      Type = "GroupBox",
+      Position = {20,20},
+      Size = {560,65},
+      StrokeColor = {0,0,0},
+      StrokeWidth = 1,
+      Fill = {255,255,255,0},
+      CornerRadius = 8
+    })
     
-        table.insert(graphics, {
-            Type = "Label",
-            Position = {20,20},
-            Size = {100,65},
-            Color = {0,0,0},
-            Text = "Recall Preset Position:",
-            Font = "Roboto",
-            FontSize = 12,
-            FontStyle = "Medium",
-            HTextAlign = "Center",
-            VTextAlign = "Center"
-        })
-
-        for i = 1, 5 do
-            layout["PresetRecall " .. i] = {
-                Style = "Button",
-                ButtonStyle = "Trigger",
-                Position = {(85 + i*45),30},
-                Size = {45,45},
-                Color = {0,159,60},
-                Margin = 2,
-                CornerRadius = 2,
-                ButtonVisualStyle = "Gloss",
-                Font = "Roboto",
-                FontSize = 24,
-                FontStyle = "Bold",
-                HTextAlign = "Center",
-                VTextAlign = "Center",
-                Legend = tostring(i)
-            }
-        end
-    
-        layout["Home"] = {
-            Style = "Button",
-            ButtonStyle = "Trigger",
-            Position = {410,30},
-            Size = {45,45},
-            Color = {0,255,0},
-            UnlinkOffColor = true,
-            OffColor = {0,159,60},
-            Margin = 2,
-            CornerRadius = 2,
-            IconColor = {255,255,255},
-            ButtonVisualStyle = "Gloss"
-        }
-    
-        layout["Privacy"] = {
-            Style = "Button",
-            ButtonStyle = "Trigger",
-            Position = {455,30},
-            Size = {45,45},
-            Color = {0,255,0},
-            UnlinkOffColor = true,
-            OffColor = {0,159,60},
-            Margin = 2,
-            CornerRadius = 2,
-            IconColor = {255,255,255},
-            ButtonVisualStyle = "Gloss"
-        }
-    
-        -- *** Preset Stores ***
-        table.insert(graphics, {
-            Type = "GroupBox",
-            Position = {20,95},
-            Size = {560,65},
-            StrokeColor = {0,0,0},
-            StrokeWidth = 1,
-            Fill = {255,255,255,0},
-            CornerRadius = 8
-        })
-    
-        table.insert(graphics, {
-            Type = "Label",
-            Position = {20,95},
-            Size = {100,65},
-            Color = {0,0,0},
-            Text = "Store Preset Position:",
-            Font = "Roboto",
-            FontSize = 12,
-            FontStyle = "Medium",
-            HTextAlign = "Center",
-        })
-
-        for i = 1, 5 do
-            layout["PresetStore " .. i] = {
-                Style = "Button",
-                ButtonStyle = "Trigger",
-                Position = {(85 + i*45),105},
-                Size = {45,45},
-                Color = {0,159,60},
-                UnlinkOffColor = true,
-                OffColor = {169,0,23},
-                Margin = 2,
-                CornerRadius = 2,
-                ButtonVisualStyle = "Gloss",
-                Font = "Roboto",
-                FontSize = 24,
-                FontStyle = "Bold",
-                HTextAlign = "Center",
-                VTextAlign = "Center",
-                Legend = tostring(i)
-            }
-        end
-
-    elseif CurrentPage == "Auto-Framing" then
-        -- *** Background ***
-        table.insert(graphics, {
-            Type = "GroupBox",
-            Position = {0,0},
-            Size = {600,225},
-            Fill = {205,205,205},
-            CornerRadius = 0,
-            StrokeColor = {0,0,0},
-            StrokeWidth = 0
-        })
-
-        -- *** Autoframe / Multitrack / Framing ***
-        table.insert(graphics, {
-            Type = "GroupBox",
-            Position = {20,20},
-            Size = {560,114},
-            StrokeColor = {0,0,0},
-            StrokeWidth = 1,
-            Fill = {255,255,255,0},
-            CornerRadius = 8
-        })
-
-        table.insert(graphics, {
-            Type = "Label",
-            Position = {30,20},
-            Size = {220,40},
-            Color = {0,0,0},
-            Text = "Turning on Multi-Person Tracking\nwill turn on Auto-Framing",
-            Font = "Roboto",
-            FontSize = 12,
-            FontStyle = "Medium",
-            HTextAlign = "Center",
-            VTextAlign = "Center"
-        })
-
-        layout["AutoframeToggle"] = {
-            Style = "Button",
-            ButtonStyle = "Toggle",
-            Position = {30,65},
-            Size = {110,60},
-            Color = {0,159,60},
-            UnlinkOffColor = true,
-            OffColor = {169,0,23},
-            Margin = 2,
-            CornerRadius = 2,
-            ButtonVisualStyle = "Gloss",
-            Font = "Roboto",
-            FontSize = 12,
-            FontStyle = "Regular",
-            HTextAlign = "Center",
-            VTextAlign = "Center",
-            Legend = "Auto-Framing"
-        }
-
-        layout["MultitrackingToggle"] = {
-            Style = "Button",
-            ButtonStyle = "Toggle",
-            Position = {141,65},
-            Size = {110,60},
-            Color = {0,159,60},
-            UnlinkOffColor = true,
-            OffColor = {169,0,23},
-            Margin = 2,
-            CornerRadius = 2,
-            ButtonVisualStyle = "Gloss",
-            Font = "Roboto",
-            FontSize = 12,
-            FontStyle = "Regular",
-            HTextAlign = "Center",
-            VTextAlign = "Center",
-            Legend = "Multi-Person\nTracking"
-        }
-
-        table.insert(graphics, {
-            Type = "Label",
-            Position = {340,20},
-            Size = {145,40},
-            Color = {0,0,0},
-            Text = "# of Multi-Track Targets\n(must enable tracking separately)",
-            Font = "Roboto",
-            FontSize = 12,
-            FontStyle = "Medium",
-            HTextAlign = "Center",
-            VTextAlign = "Center"
-        })
-
-        for i = 2, 8 do
-            layout["Multitrack " .. i] = {
-                Style = "Button",
-                ButtonStyle = "Trigger",
-                Position = {(214 + i*36),65},
-                Size = {36,30},
-                Color = {0,159,60},
-                UnlinkOffColor = true,
-                OffColor = {169,0,23},
-                Margin = 2,
-                CornerRadius = 2,
-                ButtonVisualStyle = "Gloss",
-                Font = "Roboto",
-                FontSize = 12,
-                FontStyle = "Regular",
-                HTextAlign = "Center",
-                VTextAlign = "Center",
-                Legend = tostring(i)
-            }
-        end
-
-        table.insert(graphics, {
-            Type = "GroupBox",
-            Position = {20,144},
-            Size = {560,80},
-            StrokeColor = {0,0,0},
-            StrokeWidth = 1,
-            Fill = {105,105,105,0},
-            CornerRadius = 8
-        })
-
-        table.insert(graphics, {
-            Type = "Label",
-            Position = {20,144},
-            Size = {100,80},
-            Color = {0,0,0},
-            Text = "Camera Framing:",
-            Font = "Roboto",
-            FontSize = 12,
-            FontStyle = "Medium",
-            HTextAlign = "Center",
-        })
-
-        layout["FramingFace"] = {
-            Style = "Button",
-            ButtonStyle = "Trigger",
-            Position = {130,154},
-            Size = {60,60},
-            Color = {0,159,60},
-            UnlinkOffColor = true,
-            OffColor = {169,0,23},
-            Margin = 2,
-            CornerRadius = 2,
-            ButtonVisualStyle = "Gloss",
+    table.insert(graphics, {
+      Type = "Label",
+      Position = {20,20},
+      Size = {100,65},
+      Color = {0,0,0},
+      Text = "Recall Preset Position:",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Medium",
+      HTextAlign = "Center",
+      VTextAlign = "Center"
+    })
+  
+    for i = 1, 5 do
+      layout["PresetRecall " .. i] = {
+        Style = "Button",
+        ButtonStyle = "Momentary",
+        Position = {(85 + i*45),30},
+        Size = {45,45},
+        Color = {0,159,60},
+        Margin = 2,
+        CornerRadius = 2,
+        ButtonVisualStyle = "Gloss",
         Font = "Roboto",
-        FontSize = 12,
-            FontStyle = "Regular",
-            HTextAlign = "Center",
-            VTextAlign = "Center",
-            Legend = "Face"
-        }
-
-        layout["FramingBody"] = {
-            Style = "Button",
-            ButtonStyle = "Trigger",
-            Position = {200,154},
-            Size = {60,60},
-            Color = {0,159,60},
-            UnlinkOffColor = true,
-            OffColor = {169,0,23},
-            Margin = 2,
-            CornerRadius = 2,
-            ButtonVisualStyle = "Gloss",
-        Font = "Roboto",
-        FontSize = 12,
-            FontStyle = "Regular",
-            HTextAlign = "Center",
-            VTextAlign = "Center",
-            Legend = "Body"
-        }
-
-        layout["FramingFull"] = {
-            Style = "Button",
-            ButtonStyle = "Trigger",
-            Position = {270,154},
-            Size = {60,60},
-            Color = {0,159,60},
-            UnlinkOffColor = true,
-            OffColor = {169,0,23},
-            Margin = 2,
-            CornerRadius = 2,
-            ButtonVisualStyle = "Gloss",
-            Font = "Roboto",
-            FontSize = 12,
-            FontStyle = "Regular",
-            HTextAlign = "Center",
-            VTextAlign = "Center",
-            Legend = "Full"
-        }   
+        FontSize = 24,
+        FontStyle = "Bold",
+        HTextAlign = "Center",
+        VTextAlign = "Center",
+        Legend = tostring(i)
+      }
     end
+    
+    layout["Home"] = {
+      Style = "Button",
+      ButtonStyle = "Trigger",
+      Position = {410,30},
+      Size = {45,45},
+      Color = {0,255,0},
+      UnlinkOffColor = true,
+      OffColor = {0,159,60},
+      Margin = 2,
+      CornerRadius = 2,
+      IconColor = {255,255,255},
+      ButtonVisualStyle = "Gloss"
+    }
+    
+    layout["Privacy"] = {
+      Style = "Button",
+      ButtonStyle = "Trigger",
+      Position = {455,30},
+      Size = {45,45},
+      Color = {0,255,0},
+      UnlinkOffColor = true,
+      OffColor = {0,159,60},
+      Margin = 2,
+      CornerRadius = 2,
+      IconColor = {255,255,255},
+      ButtonVisualStyle = "Gloss"
+    }
+    
+    -- *** Preset Stores ***
+    table.insert(graphics, {
+      Type = "GroupBox",
+      Position = {20,95},
+      Size = {560,65},
+      StrokeColor = {0,0,0},
+      StrokeWidth = 1,
+      Fill = {255,255,255,0},
+      CornerRadius = 8
+    })
+    
+    table.insert(graphics, {
+      Type = "Label",
+      Position = {20,95},
+      Size = {100,65},
+      Color = {0,0,0},
+      Text = "Store Preset Position:",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Medium",
+      HTextAlign = "Center",
+    })
+  
+    for i = 1, 5 do
+      layout["PresetStore " .. i] = {
+        Style = "Button",
+        ButtonStyle = "Trigger",
+        Position = {(85 + i*45),105},
+        Size = {45,45},
+        Color = {0,159,60},
+        UnlinkOffColor = true,
+        OffColor = {169,0,23},
+        Margin = 2,
+        CornerRadius = 2,
+        ButtonVisualStyle = "Gloss",
+        Font = "Roboto",
+        FontSize = 24,
+        FontStyle = "Bold",
+        HTextAlign = "Center",
+        VTextAlign = "Center",
+        Legend = tostring(i)
+      }
+    end
+  
+  elseif (currentPage == "Auto-Framing") then
 
-    return layout, graphics
+    -- *** Background ***
+    table.insert(graphics, {
+      Type = "GroupBox",
+      Position = {0,0},
+      Size = {600,225},
+      Fill = {205,205,205},
+      CornerRadius = 0,
+      StrokeColor = {0,0,0},
+      StrokeWidth = 0
+    })
+
+    -- *** Autoframe / Multitrack / Framing ***
+    table.insert(graphics, {
+      Type = "GroupBox",
+      Position = {20,20},
+      Size = {560,114},
+      StrokeColor = {0,0,0},
+      StrokeWidth = 1,
+      Fill = {255,255,255,0},
+      CornerRadius = 8
+    })
+  
+    table.insert(graphics, {
+      Type = "Label",
+      Position = {30,20},
+      Size = {220,40},
+      Color = {0,0,0},
+      Text = "Turning on Multi-Person Tracking\nwill turn on Auto-Framing",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Medium",
+      HTextAlign = "Center",
+      VTextAlign = "Center"
+    })
+  
+    layout["AutoframeToggle"] = {
+      Style = "Button",
+      ButtonStyle = "Toggle",
+      Position = {30,65},
+      Size = {110,60},
+      Color = {0,159,60},
+      UnlinkOffColor = true,
+      OffColor = {169,0,23},
+      Margin = 2,
+      CornerRadius = 2,
+      ButtonVisualStyle = "Gloss",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Regular",
+      HTextAlign = "Center",
+      VTextAlign = "Center",
+      Legend = "Auto-Framing"
+    }
+  
+    layout["MultitrackingToggle"] = {
+      Style = "Button",
+      ButtonStyle = "Toggle",
+      Position = {141,65},
+      Size = {110,60},
+      Color = {0,159,60},
+      UnlinkOffColor = true,
+      OffColor = {169,0,23},
+      Margin = 2,
+      CornerRadius = 2,
+      ButtonVisualStyle = "Gloss",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Regular",
+      HTextAlign = "Center",
+      VTextAlign = "Center",
+      Legend = "Multi-Person\nTracking"
+    }
+  
+    table.insert(graphics, {
+      Type = "Label",
+      Position = {340,20},
+      Size = {145,40},
+      Color = {0,0,0},
+      Text = "# of Multi-Track Targets\n(must enable tracking separately)",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Medium",
+      HTextAlign = "Center",
+      VTextAlign = "Center"
+    })
+  
+    for i = 2, 8 do
+      layout["Multitrack " .. i] = {
+        Style = "Button",
+        ButtonStyle = "Trigger",
+        Position = {(214 + i*36),65},
+        Size = {36,30},
+        Color = {0,159,60},
+        UnlinkOffColor = true,
+        OffColor = {169,0,23},
+        Margin = 2,
+        CornerRadius = 2,
+        ButtonVisualStyle = "Gloss",
+        Font = "Roboto",
+        FontSize = 12,
+        FontStyle = "Regular",
+        HTextAlign = "Center",
+        VTextAlign = "Center",
+        Legend = tostring(i)
+      }
+    end
+  
+    table.insert(graphics, {
+      Type = "GroupBox",
+      Position = {20,144},
+      Size = {560,80},
+      StrokeColor = {0,0,0},
+      StrokeWidth = 1,
+      Fill = {105,105,105,0},
+      CornerRadius = 8
+    })
+  
+    table.insert(graphics, {
+      Type = "Label",
+      Position = {20,144},
+      Size = {100,80},
+      Color = {0,0,0},
+      Text = "Camera Framing:",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Medium",
+      HTextAlign = "Center",
+    })
+  
+    layout["FramingFace"] = {
+      Style = "Button",
+      ButtonStyle = "Trigger",
+      Position = {130,154},
+      Size = {60,60},
+      Color = {0,159,60},
+      UnlinkOffColor = true,
+      OffColor = {169,0,23},
+      Margin = 2,
+      CornerRadius = 2,
+      ButtonVisualStyle = "Gloss",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Regular",
+      HTextAlign = "Center",
+      VTextAlign = "Center",
+      Legend = "Face"
+    }
+  
+    layout["FramingBody"] = {
+      Style = "Button",
+      ButtonStyle = "Trigger",
+      Position = {200,154},
+      Size = {60,60},
+      Color = {0,159,60},
+      UnlinkOffColor = true,
+      OffColor = {169,0,23},
+      Margin = 2,
+      CornerRadius = 2,
+      ButtonVisualStyle = "Gloss",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Regular",
+      HTextAlign = "Center",
+      VTextAlign = "Center",
+      Legend = "Body"
+    }
+  
+    layout["FramingFull"] = {
+      Style = "Button",
+      ButtonStyle = "Trigger",
+      Position = {270,154},
+      Size = {60,60},
+      Color = {0,159,60},
+      UnlinkOffColor = true,
+      OffColor = {169,0,23},
+      Margin = 2,
+      CornerRadius = 2,
+      ButtonVisualStyle = "Gloss",
+      Font = "Roboto",
+      FontSize = 12,
+      FontStyle = "Regular",
+      HTextAlign = "Center",
+      VTextAlign = "Center",
+      Legend = "Full"
+    }   
+  end
+
+  return layout, graphics
 end
 
 -- *** End Reserved Functions ***
 
 -- *** Runtime Logic ***
-if Controls then
+if (Controls) then
 
   -- *** Set Globals ***
-    Commands = {}
+
+  Commands = {}   -- UpdateCommands() will fill out this table
+
+  PresetFlag = false
+  PresetIndex = 1   -- PresetTimer event handler will use PresetIndex and PresetFlag to send commands for the correct preset button
+
+  PresetTimer = Timer.New()   -- PresetRecall will use PresetTimer to implement "press-and-hold" functionality
+
+  QueryTimer = Timer.New()
+
   -- *** End Globals ***
 
-  -- *** Helper functions ***
-    -- PrintTable() takes 2 parameters: a table, and a string of spaces for indentation in debug (ex: "  " <- 2 spaces), and prints the table to the console
-        -- ex: PrintTable(table, "   ")
-    function PrintTable(t, indent)
-        indent = indent or ""
-        for k, v in pairs(t) do
-            if type(v) == "table" then
-                print(indent .. tostring(k) .. ": {")
-                PrintTable(v, indent .. "  ") -- Recursive call for nested tables
-                print(indent .. "}")
-            else
-                print(indent .. tostring(k) .. ": " .. tostring(v))
-            end
-        end
+  -- *** Functions ***
+  -- PrintTable() takes 2 parameters: a table, and a string of spaces for indentation in debug (ex: "  " <- 2 spaces), and prints the table to the debug output
+  -- ex: PrintTable(table, "   ")
+  function PrintTable(t, indent)
+    indent = indent or ""
+    for k, v in pairs(t) do
+      if (type(v) == "table") then
+        print(indent .. tostring(k) .. ": {")
+        PrintTable(v, indent .. "  ") -- recursive call for nested tables
+        print(indent .. "}")
+      else
+        print(indent .. tostring(k) .. ": " .. tostring(v))
+      end
     end
+  end
 
-    -- UpdateVariables() instantiates and assigns values to global variables, or reports error if input parameters are not set.
-    function UpdateVariables()
-        if(Controls.Ip.String ~= "" and Controls.Username.String ~= "" and Controls.Password.String ~= "") then
-
-            -- Input:
-            Ip = Controls.Ip.String
-            Username = Controls.Username.String
-            Password = Controls.Password.String
-
-            -- Power:
-            Commands["PowerOn"] = "https://" .. Ip .. "/command/main.cgi?System=on"
-            Commands["PowerStandby"] = "https://" .. Ip .. "/command/main.cgi?System=standby"
-            Commands["PowerReboot"] = "https://" .. Ip .. "/command/main.cgi?System=reboot"
-            Commands["PowerQuery"] = "https://" .. Ip .. "/command/inquiry.cgi?inq=sysinfo"
-
-            -- Pan-Tilt-Zoom:
-            Commands["PanTiltStop"] = "https://" .. Ip .. "/command/ptzf.cgi?Move=stop,pantilt"
-            Commands["ZoomStop"] = "https://" .. Ip .. "/command/ptzf.cgi?Move=stop,zoom"
-            Commands["PanLeft"] = "https://" .. Ip .. "/command/ptzf.cgi?Move=left,6"
-            Commands["PanRight"] = "https://" .. Ip .. "/command/ptzf.cgi?Move=right,6"
-            Commands["TiltUp"] = "https://" .. Ip .. "/command/ptzf.cgi?Move=up,6"
-            Commands["TiltDown"] = "https://" .. Ip .. "/command/ptzf.cgi?Move=down,6"
-            Commands["UpLeft"] = "https://" .. Ip .. "/command/ptzf.cgi?Move=up-left,6"
-            Commands["UpRight"] = "https://" .. Ip .. "/command/ptzf.cgi?Move=up-right,6"
-            Commands["DownRight"] = "https://" .. Ip .. "/command/ptzf.cgi?Move=down-right,6"
-            Commands["DownLeft"] = "https://" .. Ip .. "/command/ptzf.cgi?Move=down-left,6"
-            Commands["ZoomIn"] = "https://" .. Ip .. "/command/ptzf.cgi?Move=tele,4"
-            Commands["ZoomOut"] = "https://" .. Ip .. "/command/ptzf.cgi?Move=wide,4"
-
-            -- Position Presets:
-            Commands["PresetRecall"] = {
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetCall=1", -- most (if not all) user-facing lua tables in QSYS' ecosystem are 1-indexed
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetCall=2",
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetCall=3",
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetCall=4",
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetCall=5"
-            }
+  -- UpdateCommands updates Commands table or reports error if input parameters are not set.
+  function UpdateCommands()
+    if (Controls.Ip.String ~= "") then
+      Commands = {
+        -- Power:
+        PowerOn = "https://" .. Ip .. "/command/main.cgi?System=on",
+        PowerStandby = "https://" .. Ip .. "/command/main.cgi?System=standby",
+        PowerReboot = "https://" .. Ip .. "/command/main.cgi?System=reboot",
+        PowerQuery = "https://" .. Ip .. "/command/inquiry.cgi?inq=sysinfo",
         
-            Commands["PresetStore"] = {
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetSet=1,,on",
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetSet=2,,on",
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetSet=3,,on",
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetSet=4,,on",
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetSet=5,,on"
-            }
+        -- Pan-Tilt-Zoom:
+        PanTiltStop = "https://" .. Ip .. "/command/ptzf.cgi?Move=stop,pantilt",
+        ZoomStop = "https://" .. Ip .. "/command/ptzf.cgi?Move=stop,zoom",
+        PanLeft = "https://" .. Ip .. "/command/ptzf.cgi?Move=left,6",
+        PanRight = "https://" .. Ip .. "/command/ptzf.cgi?Move=right,6",
+        TiltUp = "https://" .. Ip .. "/command/ptzf.cgi?Move=up,6",
+        TiltDown = "https://" .. Ip .. "/command/ptzf.cgi?Move=down,6",
+        UpLeft = "https://" .. Ip .. "/command/ptzf.cgi?Move=up-left,6",
+        UpRight = "https://" .. Ip .. "/command/ptzf.cgi?Move=up-right,6",
+        DownRight = "https://" .. Ip .. "/command/ptzf.cgi?Move=down-right,6",
+        DownLeft = "https://" .. Ip .. "/command/ptzf.cgi?Move=down-left,6",
+        ZoomIn = "https://" .. Ip .. "/command/ptzf.cgi?Move=tele,4",
+        ZoomOut = "https://" .. Ip .. "/command/ptzf.cgi?Move=wide,4",
         
-            Commands["PresetClear"] = {
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetClear=1",
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetClear=2",
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetClear=3",
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetClear=4",
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetClear=5"
-            }
+        -- Position Presets:
+        PresetRecall = {
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetCall=1", -- most (if not all) user-facing lua tables in QSYS' ecosystem are 1-indexed, so we will reference this command as Commands.PresetRecall[1] or Commands["PresetRecall"][1]
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetCall=2",
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetCall=3",
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetCall=4",
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetCall=5"
+        },
+        PresetStore = {
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetSet=1,,on",
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetSet=2,,on",
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetSet=3,,on",
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetSet=4,,on",
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetSet=5,,on"
+        },  
+        PresetClear = {
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetClear=1",
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetClear=2",
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetClear=3",
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetClear=4",
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetClear=5"
+        },  
+        PresetThumbnailClear = {
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetThumbnailClear=1",
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetThumbnailClear=2",
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetThumbnailClear=3",
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetThumbnailClear=4",
+          "https://" .. Ip .. "/command/presetposition.cgi?PresetThumbnailClear=5"
+        },   
+        Home = "https://" .. Ip .. "/command/presetposition.cgi?HomePos=recall",
+        Privacy = "https://" .. Ip .. "/command/ptzf.cgi?AbsolutePanTilt=2200,0000,18",
         
-            Commands["PresetThumbnailClear"] = {
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetThumbnailClear=1",
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetThumbnailClear=2",
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetThumbnailClear=3",
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetThumbnailClear=4",
-                "https://" .. Ip .. "/command/presetposition.cgi?PresetThumbnailClear=5"
-            }
+        -- Autoframing / Multitracking:
+        AutoframeQuery = "https://" .. Ip .. "/command/inquiry.cgi?inq=ptzautoframing",
+        AutoframeOn = "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFraming=on",
+        AutoframeOff = "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFraming=off",
+        MultitrackingOn = "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingEnable=on",
+        MultitrackingOff = "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingEnable=off",
         
-            Commands["Home"] = "https://" .. Ip .. "/command/presetposition.cgi?HomePos=recall"
-            Commands["Privacy"] = "https://" .. Ip .. "/command/ptzf.cgi?AbsolutePanTilt=2200,0000,18"
+        Multitracking = {
+          "This is index 1 (just turn multitracking off)",
+          "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingTargetNum=2",
+          "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingTargetNum=3",
+          "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingTargetNum=4",
+          "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingTargetNum=5",
+          "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingTargetNum=6",
+          "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingTargetNum=7",
+          "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingTargetNum=8"
+        },
         
-            -- Autoframing / Multitracking:
-            Commands["AutoframeQuery"] = "https://" .. Ip .. "/command/inquiry.cgi?inq=ptzautoframing"
-            Commands["AutoframeOn"] = "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFraming=on"
-            Commands["AutoframeOff"] = "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFraming=off"
-            Commands["MultitrackingOn"] = "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingEnable=on"
-            Commands["MultitrackingOff"] = "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingEnable=off"
-        
-            Commands["Multitracking"] = {
-                "This is index 1 (just turn multitracking off)",
-                "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingTargetNum=2",
-                "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingTargetNum=3",
-                "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingTargetNum=4",
-                "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingTargetNum=5",
-                "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingTargetNum=6",
-                "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingTargetNum=7",
-                "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingMultiTrackingTargetNum=8"
-            }
-        
-            Commands["FramingFace"] = "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingPresetCall=1"
-            Commands["FramingBody"] = "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingPresetCall=2"
-            Commands["FramingFull"] = "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingPresetCall=3"
-        else
-            print("Err-rar: parameter fields are not set")
-            return
-        end
-    end    
-
-    -- ParsePower checks query responses for Power elements and updates PowerToggle control.
-    function ParsePower(table, code, data, err, headers)
-        if code ~= 401 and code ~= 200 and code ~= 204 then
-            print(string.format("Err-rar: QueryPower unable to authenticate. HTTP code: %i", code))
-            PrintTable(headers, "  ")
-            return
-        else
-            print("QueryPower Http Code: " .. code)     -- the expected response code should be 200 for most inquiry requests to the Sony SRG-A40
-            if string.match(data, "&Power=(%a+)&") == "on" then 
-                Controls.PowerToggle.Boolean = true
-            elseif string.match(data,  "&Power=(%a+)&") == "standby" then 
-                Controls.PowerToggle.Boolean = false
-            else 
-                print("Undefined response to ParsePower")
-            end
-            print("ParsedPower")
-        end
+        FramingFace = "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingPresetCall=1",
+        FramingBody = "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingPresetCall=2",
+        FramingFull = "https://" .. Ip .. "/analytics/ptzautoframing.cgi?PtzAutoFramingPresetCall=3"
+      }
     end
+  end
 
-    -- ParseFraming checks query responses for AutoFraming elements and updates their respective controls.
-    function ParseFraming(table, code, data, err, headers)
-        if code ~= 401 and code ~= 200 and code ~= 204 then
-            print(string.format("Err-rar: QueryFraming unable to authenticate. HTTP code: %i", code))
-            PrintTable(headers, "  ")
-            return
-        else
-            print("QueryPFraming Http Code: " .. code)  -- expecting 200
-            if string.match(data, "PtzAutoFraming=(%a+)&") == "on" then 
-                Controls.AutoframeToggle.Boolean = true 
-            else 
-                Controls.AutoframeToggle.Boolean = false 
-            end 
-
-            if string.match(data, "PtzAutoFramingMultiTrackingEnable=(%a+)&") == "on" then
-                Controls.MultitrackingToggle.Boolean = true 
-            else 
-                Controls.MultitrackingToggle.Boolean = false 
-            end
-
-            local frame_fb = string.match(data, "PtzAutoFramingPresetNum=(%d)&")
-            if frame_fb == "3" then 
-                Controls.FramingFull.Boolean = true 
-                Controls.FramingFull.Color = "#ff009f3c"
-                Controls.FramingBody.Color = "#ffa90017"
-                Controls.FramingFace.Color = "#ffa90017"
-            elseif frame_fb == "2" then
-                Controls.FramingBody.Boolean = true 
-                Controls.FramingFull.Color = "#ffa90017"
-                Controls.FramingBody.Color = "#ff009f3c"
-                Controls.FramingFace.Color = "#ffa90017"
-            elseif frame_fb == "1" then
-                Controls.FramingFace.Boolean = true
-                Controls.FramingFull.Color = "#ffa90017"
-                Controls.framingBody.Color = "#ffa90017"
-                Controls.FramingFace.Color = "#ff009f3c"
-            end
-
-            if Controls.MultitrackingToggle.Boolean then
-                local track_fb = string.match(data, "PtzAutoFramingMultiTrackingTargetNum=(%d)&")
-                if track_fb then
-                    MultiTrackHandler(tonumber(track_fb))
-                end
-            end
-
-            print("ParsedFraming")
-        end
+  -- UpdateVariables() instantiates and assigns input values to global variables, or reports error if input parameters are not set.
+  function UpdateVariables()
+    if (Controls.Ip.String ~= "") then
+      Ip = Controls.Ip.String
+    else
+      print("Ip not set")
     end
-
-    -- SendCommand() takes one string parameter, authenticates, and passes the string parameter (command url) to the CGI as a GET http request.
-    function SendCommand(cmd)
-        print("Sent Cmd: " .. cmd)
-        HttpClient.Get { Url = cmd, User = Username, Password = Password, Auth = "digest", Timeout = 30, EventHandler = RespHandler }
+  
+    if (Controls.Username.String ~= "") then
+      Username = Controls.Username.String
+    else
+      print("Username not set")
     end
-
-    -- RespHandler() handles the response from the CGI and prints to console for debugging.
-    function RespHandler(table, code, data, err, headers)
-        if code ~= 401 and code ~= 200 and code ~= 204 then
-            print(string.format("Err-rar: Unable to authenticate. HTTP code: %i", code))
-            PrintTable(headers, "  ")
-            return
-        else
-            print("RespHandler Http Code: " .. code) -- the expected response code should be 204 for most command requests to the Sony SRG-A40
-        end
+  
+    if (Controls.Password.String ~= "") then
+      Password = Controls.Password.String
+    else
+      print("Password not set")
     end
+  end  
 
-    -- QueryPower sends a command to the CGI to return a response with the camera's power state.
-    function QueryPower()
-        print("QueriedPower")
-        if Commands.PowerQuery then
-            HttpClient.Get { Url = Commands.PowerQuery, User = Username, Password = Password, Auth = "digest", Timeout = 30, EventHandler = ParsePower }    
-        end
+  -- ParsePower checks query responses for Power elements and updates PowerToggle control.
+  function ParsePower(table, code, data, err, headers)
+    if (code ~= 401 and code ~= 200 and code ~= 204) then
+      print(string.format("Err-rar: QueryPower unable to authenticate. HTTP code: %i", code))
+      PrintTable(headers, "  ")
+      return
+    else
+      print("QueryPower Http Code: " .. code)   -- the expected response code should be 200 for most inquiry requests to the Sony SRG-A40
+      if (string.match(data, "&Power=(%a+)&") == "on") then 
+        Controls.PowerToggle.Boolean = true
+      elseif (string.match(data,  "&Power=(%a+)&") == "standby") then 
+        Controls.PowerToggle.Boolean = false
+      else 
+        print("Undefined response to ParsePower")
+      end
+      print("ParsedPower")
     end
+  end
 
-    -- QueryFraming sends a command to the CGI to return a response with the states of the cameras Autoframing features.
-    function QueryFraming()
-        print("QueriedFraming")
-        if Commands.AutoframeQuery then
-            HttpClient.Get { Url = Commands.AutoframeQuery, User = Username, Password = Password, Auth = "digest", Timeout = 30, EventHandler = ParseFraming }
-        end 
-    end
-
-    -- Timed Queries Combines power and framing queries for easy access for the QueryTimer.
-    function TimedQueries()
-        QueryPower()
-        Timer.CallAfter(QueryFraming, 1)
-        print("TimedQueries")
-    end
-
-    -- the MultiTracking/MultiTrack functions 'interlock' functionality, so that the feedback for only 1 option for # of targets can appear active, and if multi-tracking is turned off, all targets show 'off'.
-    function MultiTrackingOff()
+  -- ParseFraming checks query responses for AutoFraming elements and updates their respective controls.
+  function ParseFraming(table, code, data, err, headers)
+    if (code ~= 401 and code ~= 200 and code ~= 204) then
+      print(string.format("Err-rar: QueryFraming unable to authenticate. HTTP code: %i", code))
+      PrintTable(headers, "  ")
+      return
+    else
+      print("QueryFraming Http Code: " .. code)  -- expecting 200
+      if (string.match(data, "PtzAutoFraming=(%a+)&") == "on") then 
+        Controls.AutoframeToggle.Boolean = true 
+      else 
+        Controls.AutoframeToggle.Boolean = false 
+      end 
+  
+      if (string.match(data, "PtzAutoFramingMultiTrackingEnable=(%a+)&") == "on") then
+        Controls.MultitrackingToggle.Boolean = true 
+      else 
         Controls.MultitrackingToggle.Boolean = false 
-        SendCommand(Commands.MultitrackingOff)
-        for i = 2, 8 do
-            Controls["Multitrack"][i].Color = "#ffa90017"
+      end
+  
+      local frameFb = string.match(data, "PtzAutoFramingPresetNum=(%d)&")
+      if (frameFb == "3") then 
+        Controls.FramingFull.Boolean = true 
+        Controls.FramingFull.Color = "#ff009f3c"
+        Controls.FramingBody.Color = "#ffa90017"
+        Controls.FramingFace.Color = "#ffa90017"
+      elseif (frameFb == "2") then
+        Controls.FramingBody.Boolean = true 
+        Controls.FramingFull.Color = "#ffa90017"
+        Controls.FramingBody.Color = "#ff009f3c"
+        Controls.FramingFace.Color = "#ffa90017"
+      elseif (frameFb == "1") then
+        Controls.FramingFace.Boolean = true
+        Controls.FramingFull.Color = "#ffa90017"
+        Controls.framingBody.Color = "#ffa90017"
+        Controls.FramingFace.Color = "#ff009f3c"
+      end
+  
+      if (Controls.MultitrackingToggle.Boolean) then
+        local trackFb = string.match(data, "PtzAutoFramingMultiTrackingTargetNum=(%d)&")
+        if (trackFb) then
+          MultiTrackHandler(tonumber(track_fb))
         end
+      end
+  
+      print("ParsedFraming")
     end
+  end
 
-    function MultiTrackHandler(i)
-        if i then
-            for x = 2, 8 do
-                if i == x then
-                    Controls["Multitrack"][x].Color = "#ff009f3c"
-                else
-                    Controls["Multitrack"][x].Color = "#ffa90017"
-                end
-            end
+  -- SendCommand() takes one string parameter, authenticates, and passes the string parameter (command url) to the CGI as a GET http request.
+  function SendCommand(cmd)
+    print("Sent Cmd: " .. cmd)
+  
+    if (Ip and Username and Password) then
+      HttpClient.Get { Url = cmd, User = Username, Password = Password, Auth = "digest", Timeout = 30, EventHandler = RespHandler }
+    end
+  end
+
+  -- RespHandler() handles the response from the CGI and prints to console for debugging.
+  function RespHandler(table, code, data, err, headers)
+    if (code ~= 401 and code ~= 200 and code ~= 204) then
+      print(string.format("Err-rar: Unable to authenticate. HTTP code: %i", code))
+      PrintTable(headers, "  ")
+      return
+    else
+      print("RespHandler Http Code: " .. code) -- the expected response code should be 204 for most command requests to the Sony SRG-A40
+    end
+  end
+
+  -- QueryPower sends a command to the CGI to return a response with the camera's power state.
+  function QueryPower()
+    print("QueriedPower")
+    if (Commands.PowerQuery) then
+      HttpClient.Get { Url = Commands.PowerQuery, User = Username, Password = Password, Auth = "digest", Timeout = 30, EventHandler = ParsePower }  
+    end
+  end
+
+  -- QueryFraming sends a command to the CGI to return a response with the states of the cameras Autoframing features.
+  function QueryFraming()
+    print("QueriedFraming")
+    if (Commands.AutoframeQuery) then
+      HttpClient.Get { Url = Commands.AutoframeQuery, User = Username, Password = Password, Auth = "digest", Timeout = 30, EventHandler = ParseFraming }
+    end 
+  end
+
+  -- Timed Queries Combines power and framing queries for easy access for the QueryTimer.
+  function TimedQueries()
+    QueryPower()
+    Timer.CallAfter(QueryFraming, 1)
+    print("TimedQueries")
+  end
+
+  -- the MultiTracking/MultiTrack functions 'interlock' functionality, so that the feedback for only 1 option for # of targets can appear active, and if multi-tracking is turned off, all targets show 'off'.
+  function MultiTrackingOff()
+    Controls.MultitrackingToggle.Boolean = false 
+    SendCommand(Commands.MultitrackingOff)
+    for i = 2, 8 do
+      Controls.Multitrack[i].Color = "#ffa90017"
+    end
+  end
+
+  function MultiTrackHandler(i)
+    if (i) then
+      for x = 2, 8 do
+        if i == x then
+          Controls.Multitrack[x].Color = "#ff009f3c"
+        else
+          Controls.Multitrack[x].Color = "#ffa90017"
         end
+      end
     end
+  end
 
-    -- Query camera for updated statuses every {PollTime} seconds
-    function Poll(qt)
-        if qt then
-            qt:Stop()
-
-            PollTime = tonumber(Controls.PollTime.String) -- module polls camera for updates every {PollTime} seconds
-
-            if PollTime then
-                qt:Start(PollTime)
-            end
-        end
+  -- Query camera for updated statuses every {PollTime} seconds
+  function Poll()
+    if (QueryTimer) then
+      QueryTimer:Stop()
+  
+      PollTime = tonumber(Controls.PollTime.String) -- module polls camera for updates every {PollTime} seconds
+  
+      if (PollTime and Ip and Username and Password) then
+        QueryTimer:Start(PollTime)
+      end
     end
+  end
 
-  -- *** End Helper functions ***
+  function StorePreset(i)
+    SendCommand(Commands.PresetClear[i])
+
+    Timer.CallAfter(function() 
+      SendCommand(Commands.PresetThumbnailClear[i])
+    end, 1)
+
+    Timer.CallAfter(function()
+      SendCommand(Commands.PresetStore[i])
+    end, 1)
+  end
+  -- *** End functions ***
 
   -- *** Control Event Handlers ***
+  -- *** Input: ***
+  Controls.Ip.EventHandler = function()
+    UpdateVariables()
+    UpdateCommands()
+  end
 
-    -- *** Input: ***
-    Controls.Ip.EventHandler = UpdateVariables
+  Controls.Username.EventHandler = UpdateVariables
 
-    Controls.Username.EventHandler = UpdateVariables
+  Controls.Password.EventHandler = UpdateVariables
 
-    Controls.Password.EventHandler = UpdateVariables
+  Controls.PollTime.EventHandler = Poll
 
-    Controls.PollTime.EventHandler = Poll(QueryTimer)
+  QueryTimer.EventHandler = TimedQueries
 
-    -- *** Power: ***
-    Controls.PowerToggle.EventHandler = function()
-        if Controls.PowerToggle.Boolean then
-            SendCommand(Commands["PowerOn"])
-        else 
-            SendCommand(Commands["PowerStandby"])
-        end
+  -- *** Power: ***
+  Controls.PowerToggle.EventHandler = function()
+    if (Controls.PowerToggle.Boolean) then
+      SendCommand(Commands.PowerOn)
+    else 
+      SendCommand(Commands.PowerStandby)
     end
+  end
 
-    Controls.PowerReboot.EventHandler = function()
-        SendCommand(Commands["PowerReboot"])
+  Controls.PowerReboot.EventHandler = function()
+    SendCommand(Commands.PowerReboot)
+  end
+
+  Controls.PowerOn.EventHandler = function()
+    SendCommand(Commands.PowerOn)
+  end
+
+  Controls.PowerOff.EventHandler = function()
+    SendCommand(Commands.PowerStandby)
+  end
+
+  -- *** Pan-Tilt-Zoom ***
+  Controls.PanLeft.EventHandler = function()
+    if (Controls.PanLeft.Boolean) then
+      SendCommand(Commands.PanLeft)
+    else
+      SendCommand(Commands.PanTiltStop)
     end
+  end
 
-    Controls.PowerOn.EventHandler = function()
-        SendCommand(Commands["PowerOn"])
+  Controls.PanRight.EventHandler = function()
+    if (Controls.PanRight.Boolean) then
+      SendCommand(Commands.PanRight)
+    else
+      SendCommand(Commands.PanTiltStop)
     end
+  end
 
-    Controls.PowerOff.EventHandler = function()
-        SendCommand(Commands["PowerStandby"])
+  Controls.TiltUp.EventHandler = function()
+    if (Controls.TiltUp.Boolean) then
+      SendCommand(Commands.TiltUp)
+    else
+      SendCommand(Commands.PanTiltStop)
     end
+  end
 
-    -- *** Pan-Tilt-Zoom ***
-    Controls.PanLeft.EventHandler = function()
-        if Controls.PanLeft.Boolean then
-            SendCommand(Commands["PanLeft"])
+  Controls.TiltDown.EventHandler = function()
+    if (Controls.TiltDown.Boolean) then
+      SendCommand(Commands.TiltDown)
+    else
+      SendCommand(Commands.PanTiltStop)
+    end
+  end
+
+  Controls.UpLeft.EventHandler = function()
+    if (Controls.UpLeft.Boolean) then
+      SendCommand(Commands.UpLeft)
+    else
+      SendCommand(Commands.PanTiltStop)
+    end
+  end
+
+  Controls.UpRight.EventHandler = function()
+    if (Controls.UpRight.Boolean) then
+      SendCommand(Commands.UpRight)
+    else
+      SendCommand(Commands.PanTiltStop)
+    end
+  end
+
+  Controls.DownRight.EventHandler = function()
+    if (Controls.DownRight.Boolean) then
+      SendCommand(Commands.DownRight)
+    else
+      SendCommand(Commands.PanTiltStop)
+    end
+  end
+
+  Controls.DownLeft.EventHandler = function()
+    if (Controls.DownLeft.Boolean) then
+      SendCommand(Commands.DownLeft)
+    else
+      SendCommand(Commands.PanTiltStop)
+    end
+  end
+
+  Controls.ZoomIn.EventHandler = function()
+    if (Controls.ZoomIn.Boolean) then
+      SendCommand(Commands.ZoomIn)
+    else
+      SendCommand(Commands.ZoomStop)
+    end
+  end
+
+  Controls.ZoomOut.EventHandler = function()
+    if (Controls.ZoomOut.Boolean) then
+      SendCommand(Commands.ZoomOut)
+    else
+      SendCommand(Commands.ZoomStop)
+    end
+  end
+
+  -- *** Position Presets: ***
+  PresetTimer.EventHandler = function()
+    PresetFlag = true
+  end
+
+  for i = 1, 5 do
+    Controls.PresetRecall[i].EventHandler = function()   
+      if (Controls.PresetRecall[i].Boolean) then
+        PresetTimer:Start(2)
+        PresetFlag = false
+      else
+        PresetTimer:Stop()
+
+        if (PresetFlag) then
+          print("PresetRecall stored preset " .. tostring(i))
+          StorePreset(i)
         else
-            SendCommand(Commands["PanTiltStop"])
-        end
+          print("PresetRecall recalled preset " .. tostring(i))
+          SendCommand(Commands.PresetRecall[i])
+        end        
+      end
     end
+  end
 
-    Controls.PanRight.EventHandler = function()
-        if Controls.PanRight.Boolean then
-            SendCommand(Commands["PanRight"])
-        else
-            SendCommand(Commands["PanTiltStop"])
-        end
+  for i = 1, 5 do
+    Controls.PresetStore[i].EventHandler = function()
+      StorePreset(i)
     end
+  end
 
-    Controls.TiltUp.EventHandler = function()
-        if Controls.TiltUp.Boolean then
-            SendCommand(Commands["TiltUp"])
-        else
-            SendCommand(Commands["PanTiltStop"])
-        end
+
+  Controls.Home.EventHandler = function()
+    SendCommand(Commands.Home)
+  end
+
+  Controls.Privacy.EventHandler = function()
+    SendCommand(Commands.Privacy)
+  end
+
+  -- *** Autoframing / Multitracking: ***
+  Controls.AutoframeToggle.EventHandler = function()
+    if (Controls.AutoframeToggle.Boolean) then
+      SendCommand(Commands.AutoframeOn)
+    else 
+      SendCommand(Commands.AutoframeOff)
+      MultiTrackingOff()
     end
+  end
 
-    Controls.TiltDown.EventHandler = function()
-        if Controls.TiltDown.Boolean then
-            SendCommand(Commands["TiltDown"])
-        else
-            SendCommand(Commands["PanTiltStop"])
-        end
+  Controls.MultitrackingToggle.EventHandler = function()
+    if (Controls.MultitrackingToggle.Boolean) then
+      SendCommand(Commands.MultitrackingOn)     
+      if (not Controls.AutoframeToggle.Boolean) then 
+        Controls.AutoframeToggle.Boolean = true
+        SendCommand(Commands.AutoframeOn)
+      end  
+      QueryFraming()
+    else
+      MultiTrackingOff()
     end
+  end
 
-    Controls.UpLeft.EventHandler = function()
-        if Controls.UpLeft.Boolean then
-            SendCommand(Commands["UpLeft"])
-        else
-            SendCommand(Commands["PanTiltStop"])
-        end
+  for i = 2, 8 do
+    Controls.Multitrack[i].EventHandler = function()
+      MultiTrackHandler(i)
+      SendCommand(Commands.Multitracking[i])
     end
+  end
 
-    Controls.UpRight.EventHandler = function()
-        if Controls.UpRight.Boolean then
-            SendCommand(Commands["UpRight"])
-        else
-            SendCommand(Commands["PanTiltStop"])
-        end
-    end
+  Controls.FramingFace.EventHandler = function()
+    SendCommand(Commands.FramingFace)
+    Controls.FramingFace.Color = "#ff009f3c"
+    Controls.FramingBody.Color = "#ffa90017"
+    Controls.FramingFull.Color = "#ffa90017"
+  end 
 
-    Controls.DownRight.EventHandler = function()
-        if Controls.DownRight.Boolean then
-            SendCommand(Commands["DownRight"])
-        else
-            SendCommand(Commands["PanTiltStop"])
-        end
-    end
+  Controls.FramingBody.EventHandler = function()
+    SendCommand(Commands.FramingBody)
+    Controls.FramingFace.Color = "#ffa90017"
+    Controls.FramingBody.Color = "#ff009f3c"
+    Controls.FramingFull.Color = "#ffa90017"
+  end 
 
-    Controls.DownLeft.EventHandler = function()
-        if Controls.DownLeft.Boolean then
-            SendCommand(Commands["DownLeft"])
-        else
-            SendCommand(Commands["PanTiltStop"])
-        end
-    end
+  Controls.FramingFull.EventHandler = function()
+    SendCommand(Commands.FramingFull)
+    Controls.FramingFace.Color = "#ffa90017"
+    Controls.FramingBody.Color = "#ffa90017"
+    Controls.FramingFull.Color = "#ff009f3c"
+  end
 
-    Controls.ZoomIn.EventHandler = function()
-        if Controls.ZoomIn.Boolean then
-            SendCommand(Commands["ZoomIn"])
-        else
-            SendCommand(Commands["ZoomStop"])
-        end
-    end
-
-    Controls.ZoomOut.EventHandler = function()
-        if Controls.ZoomOut.Boolean then
-            SendCommand(Commands["ZoomOut"])
-        else
-            SendCommand(Commands["ZoomStop"])
-        end
-    end
-
-    -- *** Position Presets: ***
-    for i = 1, 5 do
-        Controls["PresetRecall"][i].EventHandler = function()
-            SendCommand(Commands["PresetRecall"][i])
-        end
-    end
-
-    for i = 1, 5 do
-        Controls["PresetStore"][i].EventHandler = function()
-            SendCommand(Commands["PresetClear"][i])
-            SendCommand(Commands["PresetThumbnailClear"][i])
-            SendCommand(Commands["PresetStore"][i])
-        end
-    end
-
-
-    Controls.Home.EventHandler = function()
-        SendCommand(Commands["Home"])
-    end
-
-    Controls.Privacy.EventHandler = function()
-        SendCommand(Commands["Privacy"])
-    end
-
-    -- *** Autoframing / Multitracking: ***
-    Controls.AutoframeToggle.EventHandler = function()
-        if Controls.AutoframeToggle.Boolean then
-            SendCommand(Commands["AutoframeOn"])
-        else 
-            SendCommand(Commands["AutoframeOff"])
-            MultiTrackingOff()
-        end
-    end
-
-    Controls.MultitrackingToggle.EventHandler = function()
-        if Controls.MultitrackingToggle.Boolean then
-            SendCommand(Commands["MultitrackingOn"])
-            
-            if not Controls.AutoframeToggle.Boolean then 
-                Controls.AutoframeToggle.Boolean = true
-                SendCommand(Commands["AutoframeOn"])
-            end
-
-            QueryFraming()
-        else
-            MultiTrackingOff()
-        end
-    end
-
-    for i = 2, 8 do
-        Controls["Multitrack"][i].EventHandler = function()
-            MultiTrackHandler(i)
-            SendCommand(Commands["Multitracking"][i])
-        end
-    end
-
-    Controls.FramingFace.EventHandler = function()
-        SendCommand(Commands["FramingFace"])
-        Controls.FramingFace.Color = "#ff009f3c"
-        Controls.FramingBody.Color = "#ffa90017"
-        Controls.FramingFull.Color = "#ffa90017"
-    end 
-
-    Controls.FramingBody.EventHandler = function()
-        SendCommand(Commands["FramingBody"])
-        Controls.FramingFace.Color = "#ffa90017"
-        Controls.FramingBody.Color = "#ff009f3c"
-        Controls.FramingFull.Color = "#ffa90017"
-    end 
-
-    Controls.FramingFull.EventHandler = function()
-        SendCommand(Commands["FramingFull"])
-        Controls.FramingFace.Color = "#ffa90017"
-        Controls.FramingBody.Color = "#ffa90017"
-        Controls.FramingFull.Color = "#ff009f3c"
-    end
   -- *** End Control Event Handlers ***
 
   -- *** Startup ***
-    QueryTimer = Timer.New()
-    QueryTimer.EventHandler = TimedQueries
-    
-    if Controls.Ip.String and Controls.Username.String and Controls.Password.String then
-        UpdateVariables()
-        TimedQueries()
-    end
-    
-    if Controls.PollTime.String then
-        Poll(QueryTimer)
-    end
+  UpdateVariables()
+  UpdateCommands()
+  TimedQueries()
+  
+  if (Controls.PollTime.String ~= "") then
+    Poll()
+  end
   -- *** End Startup ***
 end
